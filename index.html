@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Miniature © Gihh Hosting</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background:#e0e7ff;
+  overflow-x:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:30px 15px;
+  color:#1e293b;
+  min-height:100vh;
+  position:relative;
+}
+/* Animated bubbles */
+.bubble { position:absolute; border-radius:50%; background: rgba(99,102,241,0.2); animation: rise 10s linear infinite; opacity:0.6; }
+@keyframes rise { 0% { transform: translateY(100vh) scale(0.5); opacity:0; } 20% { opacity:0.3; } 50% { opacity:0.6; } 80% { opacity:0.3; } 100% { transform: translateY(-20vh) scale(1); opacity:0; } }
+
+h1 { font-size:2rem; margin-bottom:20px; text-align:center; color:#4f46e5; z-index:2; }
+
+.tabs { display:flex; gap:15px; margin-bottom:30px; z-index:2; }
+.tabs button { padding:12px 25px; border-radius:12px; border:2px solid #6366f1; cursor:pointer; background:white; font-weight:600; color:#4f46e5; transition:0.3s; }
+.tabs button.active { background:#6366f1; color:white; }
+.tabs button:hover { background:#4f46e5; color:white; }
+
+.box { background:#fff; border-radius:20px; padding:35px 25px; max-width:500px; width:100%; box-shadow:0 15px 30px rgba(0,0,0,0.1); text-align:center; display:none; position:relative; z-index:2; }
+.box.active { display:block; }
+
+.drop-area { border:3px dashed #6366f1; border-radius:15px; padding:60px; margin-bottom:15px; cursor:pointer; color:#4f46e5; font-weight:bold; font-size:1.1rem; transition: background 0.3s, border-color 0.3s, transform 0.3s; }
+.drop-area.hover { background:#eef2ff; border-color:#4f46e5; transform:scale(1.03); }
+
+input[type="file"] { display:none; }
+input[type="text"], button { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #cbd5e1; font-size:1rem; transition:0.3s; }
+button { background:#6366f1; color:white; border:none; font-weight:bold; cursor:pointer; transition:all 0.3s; }
+button:hover { background:#4f46e5; transform:translateY(-2px) scale(1.05); box-shadow:0 6px 15px rgba(0,0,0,0.15); }
+
+#uploadResult, #figureResult { margin-top:20px; word-break:break-word; text-align:center; }
+pre { color:red; text-align:left; white-space:pre-wrap; }
+
+.spinner { border:5px solid #f3f3f3; border-top:5px solid #6366f1; border-radius:50%; width:50px; height:50px; animation:spin 1s linear infinite; margin:20px auto; }
+@keyframes spin { 100% { transform:rotate(360deg); } }
+
+.instructions { margin-top:35px; max-width:500px; text-align:left; background:#eef2ff; padding:25px; border-radius:15px; box-shadow:0 8px 20px rgba(0,0,0,0.05); z-index:2; }
+.instructions h2 { margin-bottom:10px; color:#6366f1; }
+.instructions li { margin-bottom:10px; line-height:1.5; }
+
+@media(max-width:500px){ .box { padding:25px; } .tabs button { padding:10px 15px; font-size:0.9rem; } .instructions { padding:20px; } .drop-area { padding:50px; font-size:1rem; } }
+</style>
+</head>
+<body>
+
+<h1>𝐌𝐢𝐧𝐢𝐚𝐭𝐮𝐫𝐞 𝐆𝐢𝐡𝐡 𝐇𝐨𝐬𝐭𝐢𝐧𝐠</h1>
+
+<div class="tabs">
+  <button id="tabImg" class="active" onclick="openTab('img')">Image To URL</button>
+  <button id="tabFig" onclick="openTab('figure')">URL To Miniatur</button>
+</div>
+
+<div id="img" class="box active">
+  <div class="drop-area" id="dropArea">Klik Atau Upload Gambar Di Sini</div>
+  <input type="file" id="fileInput">
+  <div id="spinnerContainer"></div>
+  <div id="uploadResult"></div>
+</div>
+
+<div id="figure" class="box">
+  <input type="text" id="urlInput" placeholder="Masukkan URL gambar">
+  <button onclick="generateFigure()">URL To Miniatur</button>
+  <div id="figureResult"></div>
+</div>
+
+<div class="instructions">
+<h2>Cara Penggunaan :</h2>
+<ol>
+<li>Pilih Bagian <strong>Image To URL</strong>.</li>
+<li>Upload Gambar Ke Box. Halaman Otomatis Akan Refresh, Nama File Dan URL Akan Muncul.</li>
+<li>Pindah Ke Bagian <strong>URL To Miniatur</strong> Untuk Membuat Miniatur.</li>
+<li>Masukkan URL Hasil Upload Dan Klik <strong>URL To Miniatur</strong>.</li>
+<li>Download Hasil Miniatur.</li>
+</ol>
+</div>
+
+</div>
+<div class="music-player" onclick="toggleMusic()">
+  <i class="fas fa-music"></i>
+  <audio id="bgMusic" src="https://files.catbox.moe/o1n094.mp3" controls loop></audio>
+</div>
+
+<footer>
+  © Hidup Harus Dibawa Asik, Biar Yang Iri Tambah Berisik.
+</footer>
+
+<script>
+// Tab switching
+function openTab(tab){
+  document.querySelectorAll('.box').forEach(b=>b.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.remove('active'));
+  if(tab==='img') document.getElementById('tabImg').classList.add('active');
+  else document.getElementById('tabFig').classList.add('active');
+}
+
+// Drop & file input
+const dropArea = document.getElementById('dropArea');
+const fileInput = document.getElementById('fileInput');
+const spinnerContainer = document.getElementById('spinnerContainer');
+
+dropArea.addEventListener('click', ()=>fileInput.click());
+dropArea.addEventListener('dragover', e=>{ e.preventDefault(); dropArea.classList.add('hover'); });
+dropArea.addEventListener('dragleave', e=>{ dropArea.classList.remove('hover'); });
+dropArea.addEventListener('drop', e=>{
+  e.preventDefault();
+  dropArea.classList.remove('hover');
+  if(e.dataTransfer.files.length){
+    const file = e.dataTransfer.files[0];
+    sessionStorage.setItem('uploadedFileName', file.name); 
+    uploadAndRefresh(file);
+  }
+});
+
+fileInput.addEventListener('change', ()=>{
+  if(fileInput.files.length){
+    const file = fileInput.files[0];
+    sessionStorage.setItem('uploadedFileName', file.name);
+    uploadAndRefresh(file);
+  }
+});
+
+async function uploadAndRefresh(file){
+  spinnerContainer.innerHTML = '<div class="spinner"></div>';
+  const form = new FormData();
+  form.append("reqtype","fileupload");
+  form.append("fileToUpload", file);
+
+  try{
+    const res = await fetch("/api/upload",{ method:"POST", body:form });
+    if(!res.ok) throw new Error(await res.text());
+    const url = await res.text();
+    localStorage.setItem('lastUploadedURL', url); 
+    location.reload(); // reload halaman
+  }catch(err){
+    console.error(err);
+    spinnerContainer.innerHTML = '';
+    alert("Upload gagal: "+err.message);
+  }
+}
+
+// Tampilkan nama file & URL setelah reload
+window.addEventListener('DOMContentLoaded', ()=>{
+  const fileName = sessionStorage.getItem('uploadedFileName');
+  const url = localStorage.getItem('lastUploadedURL');
+  if(fileName) dropArea.textContent = `File terpilih: ${fileName}`;
+  if(url) document.getElementById('uploadResult').innerHTML = `URL: <a href="${url}" target="_blank">${url}</a> <button onclick="copyURL('${url}')">Copy URL</button>`;
+});
+
+// Copy URL
+function copyURL(url){
+  navigator.clipboard.writeText(url).then(()=>alert("URL berhasil disalin!"));
+}
+
+// Generate figure
+async function generateFigure(){
+  const url = document.getElementById("urlInput").value.trim();
+  const resultDiv = document.getElementById("figureResult");
+  if(!url) return alert("Masukkan URL gambar!");
+
+  resultDiv.innerHTML = '<div class="spinner"></div>';
+
+  try{
+    const res = await fetch(`/api/figure?url=${encodeURIComponent(url)}`);
+    const contentType = res.headers.get("content-type");
+    if(!res.ok) throw new Error(await res.text());
+
+    if(contentType && contentType.includes("image")){
+      const blob = await res.blob();
+      const imgURL = URL.createObjectURL(blob);
+      resultDiv.innerHTML = `<img src="${imgURL}" style="max-width:100%;height:auto;"><br>
+      <a href="${imgURL}" download="figure.jpg"><button>Download</button></a>`;
+    } else {
+      throw new Error(await res.text());
+    }
+  }catch(err){
+    console.error(err);
+    resultDiv.innerHTML = `<pre>Error:\n${err.message}</pre>`;
+  }
+}
+
+// Generate animated bubbles
+for(let i=0;i<20;i++){
+  const bubble = document.createElement('div');
+  bubble.classList.add('bubble');
+  bubble.style.width = `${Math.random()*60+20}px`;
+  bubble.style.height = bubble.style.width;
+  bubble.style.left = `${Math.random()*100}vw`;
+  bubble.style.animationDuration = `${5+Math.random()*10}s`;
+  bubble.style.opacity = Math.random()*0.6+0.2;
+  document.body.appendChild(bubble);
+}
+</script>
+
+</body>
+</html>
